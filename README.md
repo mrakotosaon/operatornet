@@ -51,7 +51,7 @@ If you use our work, please cite our paper.
 @article{huang2019operatornet,
   title={OperatorNet: Recovering 3D Shapes From Difference Operators},
   author={Huang, Ruqi and Rakotosaona, Marie-Julie and Achlioptas, Panos and Guibas, Leonidas and Ovsjanikov, Maks},
-  journal={arXiv preprint arXiv:1904.10754},
+  journal={ICCV},
   year={2019}
 }
 ```
