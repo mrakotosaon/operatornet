@@ -23,7 +23,11 @@ Clone this repository:
 git clone https://github.com/mrakotosaon/operatornet.git
 cd operatornet
 ```
+## Shape difference operators
 
+To generate demo shape difference matrices: run demo_compute_shape_diff.m with Matlab.
+
+## Models
 
 Download pretrained models:
 ``` bash
