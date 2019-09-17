@@ -1,0 +1,13 @@
+*.pyc
+.project
+.pydevproject
+.ipynb_checkpoints
+.settings
+*.swp
+notebooks/panos/.ipynb_checkpoints/
+external/Chamfer_EMD_losses/*.so
+external/Chamfer_EMD_losses/*.o
+external/Chamfer_EMD_tf1plus/*.so
+external/Chamfer_EMD_tf1plus/*.o
+*.so
+*.o

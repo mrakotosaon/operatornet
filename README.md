@@ -15,8 +15,8 @@ This code was written by Ruqi Huang and Marie-Julie Rakotosaona.
 Install required python packages, if they are not already installed:
 ``` bash
 pip install numpy
+pip install plyfile
 ```
-
 
 Clone this repository:
 ``` bash
@@ -33,17 +33,30 @@ python download_models.py
 
  ## Data
 
-Our data can be found here:
+A demo dataset can be found here: https://nuage.lix.polytechnique.fr/index.php/s/BqiX5rcWszkKT9N
 
-It contains the following files:
+It contains shape differences and labels as Matlab matrices. This dataset is a simplified version of the one used in the paper.
 
+
+Download pretrained models:
+``` bash
+cd Data
+python download_demo_data.py
+```
 
 
 ## Training
-To train OperatorNet with the default settings:
+To train OperatorNet with the default settings and demo data:
 ``` bash
-python train_operatornet.py
+python train.py
 ```
+
+## Test
+To test OperatorNet with the default settings and demo shapes:
+``` bash
+python test.py
+```
+Two shapes get reconstructed and inteprolated.
 
 ## Citation
 If you use our work, please cite our paper.
