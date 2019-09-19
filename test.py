@@ -28,10 +28,10 @@ def reconstruct_shapes(sess, ops, SD, results_path):
         save_ply(recons_val[i], triv,os.path.join(results_path, "shape{}.ply".format(i)) )
 
 def interpolate_shapes(sess, ops, SD, results_path, n_interpolation = 10):
-    # interpolate 1rst and 2nd shape in SD
+    # interpolate last 2 shapes in SD
     triv = loadmat("Data/AuxData/TRIV.mat")['TRIV'] - 1
-    logA = [logm(SD[0, : ,:,i]) for i in range(3)]
-    logB = [logm(SD[1, : ,:,i]) for i in range(3)]
+    logA = [logm(SD[3, : ,:,i]) for i in range(3)]
+    logB = [logm(SD[4, : ,:,i]) for i in range(3)]
 
     interpolated_sd = [np.expand_dims(np.array([expm((1-t)*logA[sd_type] + t*logB[sd_type]) for t in np.linspace(0,1,n_interpolation)]), -1) for sd_type in range(3)]
     interpolated_sd = np.concatenate(interpolated_sd, -1)
@@ -40,14 +40,18 @@ def interpolate_shapes(sess, ops, SD, results_path, n_interpolation = 10):
     for i in range(n_interpolation):
          save_ply(recons_val[i], triv,os.path.join(results_path, "interp_shape{}.ply".format(i)) )
 
+def analogy(sess, ops, SD, results_path):
+    # analogy between first 3 shapes
+    triv = loadmat("Data/AuxData/TRIV.mat")['TRIV'] - 1
+    SD_X = [np.dot(np.dot(SD[1, :, :, i], np.linalg.pinv(SD[0, :, :, i])), SD[2, :, :, i]) for i in range(3)]
+    SD_X = np.concatenate(SD_X, 3)
+    import pdb; pdb.set_trace()
+    feed_dict = {ops['feed_pl']:SD_X}
+    recons_val = sess.run(ops['x_reconstr'], feed_dict)
+    for i, e in enumerate(["A", "B", "C", "X"]):
+        save_ply(recons_val[i], triv,os.path.join(results_path, "analogy_shape{}.ply".format(e)) )
 
-def test():
-    n_pc_points = 1000
-    n_cons = 60 # size of reduced basis
-    n_channels = 3
-    model_path = "models/best_surreal+dfaust_red_conv_A+C+E.ckpt" # demo model path
-    #model_path =  "models/best_model_{channels}.ckpt".format(channels = channels)
-    n_shapes = 2
+def init_graph(n_cons, n_pc_points, n_channels, model_path):
     # init graph
     reset_tf_graph()
     x_reconstr, feed_pl, labels_pl = diff_reconstructor(n_cons, n_pc_points, n_channels)
@@ -60,18 +64,31 @@ def test():
     sess.run(init)
     saver = tf.train.Saver()
     saver.restore(sess, model_path)
-    results_path = "results/"
+    return sess, ops
 
-    data_path = "Data/ShapeOperators"
+def load_data(data_path, n_shapes, n_cons):
     area = load_SD(os.path.join(data_path, "AreaSD.mat"), n_shapes, n_cons)
     conf = load_SD(os.path.join(data_path, "ConfSD.mat"), n_shapes, n_cons)
     ext = load_SD(os.path.join(data_path, "ExtSD.mat"), n_shapes, n_cons)
     data = np.concatenate([ext, area, conf], 3)
-    ## reconstruct some shapes
-    # reconstruct_shapes(sess, ops, data, results_path)
-    # interpolate shapes from data
-    interpolate_shapes(sess, ops, data, results_path)
+    return data
 
 
 if __name__ == '__main__':
-    test()
+    n_pc_points = 1000
+    n_cons = 60 # size of reduced basis
+    n_channels = 3
+    model_path = "models/best_surreal+dfaust_red_conv_A+C+E.ckpt" # demo model path
+    #model_path =  "models/best_model_{channels}.ckpt".format(channels = channels)
+    results_path = "results/"
+    data_path = "Data/ShapeOperators"
+    n_shapes = 2
+    sess, ops = init_graph(n_cons, n_pc_points, n_channels, model_path)
+    data = load_SD(data_path, n_shapes, n_cons)
+
+    ## reconstruct demo shapes
+    # reconstruct_shapes(sess, ops, data, results_path)
+    # interpolate shapes from data
+    #interpolate_shapes(sess, ops, data, results_path)
+    # analogy between demo shapes
+    analogy(sess, ops, data, results_path)
