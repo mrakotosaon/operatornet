@@ -14,7 +14,7 @@ def totuple(a):
     return [ tuple(i) for i in a]
 
 def save_ply(V,T,filename):
-    vertex = np.array(totuple(V),dtype=[('x', 'f4'), ('y', 'f4'),('z', 'f4')])
+    vertex = np.array(totuple(V),dtype=[('x', 'f4'), ('z', 'f4'),('y', 'f4')])
     face = np.array([ tuple([i]) for i in T],dtype=[('vertex_indices', 'i4', (3,))])
     el1 = PlyElement.describe(vertex, 'vertex')
     el2 = PlyElement.describe(face, 'face')
@@ -87,6 +87,7 @@ if __name__ == '__main__':
     data = load_data(data_path, n_shapes, n_cons)
 
     # produced shapes are saved in the results directory
+    # see the ground truth in ./results/groundtruth
     ## reconstruct demo shapes
     reconstruct_shapes(sess, ops, data, results_path)
 
