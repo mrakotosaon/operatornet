@@ -117,7 +117,7 @@ def test_one_epoch(net_data, batch_size, feed_pl, labels_pl, loss, sess, n_test_
 def train():
     learning_rate = 0.0001
     max_epochs = 450
-    data_path= "Data/demo_dfaust_data"
+    data_path= "data/demo_dfaust_data"
     n_pc_points = 1000
     n_cons = 60 # size of reduced basis
     channels = "A+C+E"

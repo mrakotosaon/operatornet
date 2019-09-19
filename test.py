@@ -21,15 +21,15 @@ def save_ply(V,T,filename):
     PlyData([el1,el2]).write(filename)
 
 def reconstruct_shapes(sess, ops, SD, results_path):
-    triv = loadmat("Data/AuxData/TRIV.mat")['TRIV'] - 1
+    triv = loadmat("data/auxdata/TRIV.mat")['TRIV'] - 1
     feed_dict = {ops['feed_pl']:SD}
     recons_val = sess.run(ops['x_reconstr'], feed_dict)
     for i in range(len(recons_val)):
-        save_ply(recons_val[i], triv,os.path.join(results_path, "shape{}.ply".format(i)) )
+        save_ply(recons_val[i], triv,os.path.join(results_path, "recons_shape{}.ply".format(i)) )
 
 def interpolate_shapes(sess, ops, SD, results_path, n_interpolation = 10):
     # interpolate last 2 shapes in SD
-    triv = loadmat("Data/AuxData/TRIV.mat")['TRIV'] - 1
+    triv = loadmat("data/auxdata/TRIV.mat")['TRIV'] - 1
     logA = [logm(SD[3, : ,:,i]) for i in range(3)]
     logB = [logm(SD[4, : ,:,i]) for i in range(3)]
 
@@ -42,11 +42,11 @@ def interpolate_shapes(sess, ops, SD, results_path, n_interpolation = 10):
 
 def analogy(sess, ops, SD, results_path):
     # analogy between first 3 shapes
-    triv = loadmat("Data/AuxData/TRIV.mat")['TRIV'] - 1
-    SD_X = [np.dot(np.dot(SD[1, :, :, i], np.linalg.pinv(SD[0, :, :, i])), SD[2, :, :, i]) for i in range(3)]
-    SD_X = np.concatenate(SD_X, 3)
-    import pdb; pdb.set_trace()
-    feed_dict = {ops['feed_pl']:SD_X}
+    triv = loadmat("data/auxdata/TRIV.mat")['TRIV'] - 1
+    SD_X = [np.expand_dims(np.dot(np.dot(SD[1, :, :, i], np.linalg.pinv(SD[0, :, :, i])), SD[2, :, :, i]), -1) for i in range(3)]
+    SD_X = np.concatenate(SD_X, 2)
+    eval_sd = np.concatenate([SD[:3], np.expand_dims(SD_X, 0)], 0)
+    feed_dict = {ops['feed_pl']:eval_sd}
     recons_val = sess.run(ops['x_reconstr'], feed_dict)
     for i, e in enumerate(["A", "B", "C", "X"]):
         save_ply(recons_val[i], triv,os.path.join(results_path, "analogy_shape{}.ply".format(e)) )
@@ -80,15 +80,18 @@ if __name__ == '__main__':
     n_channels = 3
     model_path = "models/best_surreal+dfaust_red_conv_A+C+E.ckpt" # demo model path
     #model_path =  "models/best_model_{channels}.ckpt".format(channels = channels)
-    results_path = "results/"
-    data_path = "Data/ShapeOperators"
-    n_shapes = 2
+    results_path = "results"
+    data_path = "data/shapeoperators"
+    n_shapes = 5
     sess, ops = init_graph(n_cons, n_pc_points, n_channels, model_path)
-    data = load_SD(data_path, n_shapes, n_cons)
+    data = load_data(data_path, n_shapes, n_cons)
 
+    # produced shapes are saved in the results directory
     ## reconstruct demo shapes
-    # reconstruct_shapes(sess, ops, data, results_path)
-    # interpolate shapes from data
-    #interpolate_shapes(sess, ops, data, results_path)
-    # analogy between demo shapes
+    reconstruct_shapes(sess, ops, data, results_path)
+
+    ## interpolate shapes from data
+    interpolate_shapes(sess, ops, data, results_path)
+
+    ## analogy between demo shapes
     analogy(sess, ops, data, results_path)

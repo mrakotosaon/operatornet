@@ -60,7 +60,9 @@ To test OperatorNet with the default settings and demo shapes:
 ``` bash
 python test.py
 ```
-Two shapes get reconstructed and inteprolated.
+From generated demo shapes, run reconstruction, interpolation or analogy (see code).
+
+Produced shapes are saved in a results directory. Please create this directory if it does not exist.
 
 ## Citation
 If you use our work, please cite our paper.
