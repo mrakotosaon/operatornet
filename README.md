@@ -1,4 +1,4 @@
-# OperatorNet
+# OperatorNet: Recovering 3D Shapes From Difference Operators
 This is our implementation of OperatorNet, a network that reconstructs shapes from shape difference operators.
 
 
